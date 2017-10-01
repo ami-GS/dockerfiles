@@ -13,5 +13,6 @@ RUN apt-get update && apt-get install -y \
     libyaml-dev \
     && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/NervanaSystems/neon /root/neon \
-    && make -C /root/neon sysinstall
+    && make -C /root/neon sysinstall \
+    && rm -rf /root/neon/mkl*.tgz
 WORKDIR /root/neon
