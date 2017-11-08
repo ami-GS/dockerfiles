@@ -1,6 +1,6 @@
 FROM golang:latest
 
-ENV GOPATH=$GOPATH:/go
+ENV GOPATH=/home/Go
 WORKDIR /root
 RUN apt-get update \
     && apt-get install -y \
