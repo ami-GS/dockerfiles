@@ -20,5 +20,5 @@ RUN apt-get update \
     && chsh -s /bin/zsh root \
     && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P /root/dotfiles \
     && cp -r /root/dotfiles/.emacs.d .
-CMD tmux
 
+CMD tmux -2
