@@ -27,3 +27,4 @@ RUN apt-get update \
     && mkdir build && cd build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make && make install
 CMD tmux -2
+ENV INDOCKER=y
