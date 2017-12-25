@@ -1,8 +1,9 @@
 FROM golang:latest
 
-ENV GOPATH=/home/Go
+ENV HOME=/home
+ENV GOPATH=$HOME/Go
 ENV PATH=$PATH:/$GOPATH/bin
-WORKDIR /root
+WORKDIR $HOME
 RUN apt-get update \
     && apt-get install -y \
     tmux \
@@ -19,14 +20,14 @@ RUN apt-get update \
     && locale-gen \
     && git config --global user.name ami-GS \
     && git config --global user.email 1991.daiki@gmail.com \
-    && cd /root \
+    && cd $HOME \
     && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/ami-GS/dotfiles \
-    && cp /root/dotfiles/.tmux.conf /root \
-    && cp /root/dotfiles/.emacs . \
-    && cp /root/dotfiles/.zshrc . \
-    && cp -r /root/dotfiles/.emacs.d . \
-    && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P /root/dotfiles \
+    && cp $HOME/dotfiles/.tmux.conf $HOME \
+    && cp $HOME/dotfiles/.emacs . \
+    && cp $HOME/dotfiles/.zshrc . \
+    && cp -r $HOME/dotfiles/.emacs.d . \
+    && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P $HOME/dotfiles \
     && chsh -s /bin/zsh root \
     && git clone https://github.com/Andersbakken/rtags && cd rtags \
     && git submodule init && git submodule update \
