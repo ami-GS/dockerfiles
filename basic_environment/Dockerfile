@@ -15,6 +15,11 @@ RUN apt-get update \
     cmake \
     llvm libclang-dev \
     ncurses-dev \
+    openssh-server \
+    && mkdir /var/run/sshd \
+    && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
+    && echo -n "root\nroot" | passwd root \
+    && service ssh start \
     && locale-gen en_US.UTF-8 \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
@@ -46,5 +51,6 @@ RUN apt-get update \
     && go get github.com/kisielk/errcheck \
     && go get github.com/peco/peco/cmd/peco
 
-CMD tmux -2
+CMD service ssh start && tmux -2
 ENV INDOCKER=y
+EXPOSE 22
