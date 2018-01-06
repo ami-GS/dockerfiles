@@ -10,6 +10,7 @@ RUN apt-get install -y --no-install-recommends \
     htop \
     tig \
     zsh \
+    python-pip exuberant-ctags \
     emacs \
     locales \
     cmake \
@@ -43,8 +44,10 @@ RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
     && mkdir build && cd build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make && make install
     # gtags settings
-RUN wget http://tamacom.com/global/global-6.5.6.tar.gz \
-    && tar -zxvf global-6.5.6.tar.gz && cd global-6.5.6 && ./configure && make -j && make install -j && cd
+RUN pip install Pygments \
+    && wget http://tamacom.com/global/global-6.5.6.tar.gz -P $HOME/dotfiles \
+    && tar -zxvf $HOME/dotfiles/global-6.5.6.tar.gz -C /$HOME/dotfiles && cd $HOME/dotfiles//global-6.5.6 \
+    && ./configure && make -j && make install -j && cd $HOME
     # ghq settings
 RUN go get github.com/motemen/ghq \
     && git config --global ghq.root $GOPATH/src
