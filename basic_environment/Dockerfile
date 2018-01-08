@@ -4,6 +4,7 @@ ENV HOME=/home
 ENV GOPATH=$HOME/Go
 ENV PATH=$PATH:/$GOPATH/bin
 WORKDIR $HOME
+# no RUN could reduce size 0.02GB
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends \
     tmux \
@@ -16,7 +17,8 @@ RUN apt-get install -y --no-install-recommends \
     cmake \
     llvm libclang-dev \
     ncurses-dev \
-    openssh-server
+    openssh-server \
+    && rm -rf /var/lib/apt/lists/*
     # ssh settings
 RUN mkdir /var/run/sshd \
     && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
@@ -29,8 +31,6 @@ RUN locale-gen en_US.UTF-8 \
     # git settings
 RUN git config --global user.name ami-GS \
     && git config --global user.email 1991.daiki@gmail.com \
-    && cd $HOME \
-    && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/ami-GS/dotfiles \
     && cp $HOME/dotfiles/.tmux.conf $HOME \
     && cp $HOME/dotfiles/.emacs . \
@@ -42,19 +42,22 @@ RUN git config --global user.name ami-GS \
 RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
     && git submodule init && git submodule update \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make && make install
+    # make -j sometimes cause syncronization error
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make -j && make install \
+    && cd $HOME && rm -rf $HOME/rtags
     # gtags settings
 RUN pip install Pygments \
     && wget http://tamacom.com/global/global-6.5.6.tar.gz -P $HOME/dotfiles \
     && tar -zxvf $HOME/dotfiles/global-6.5.6.tar.gz -C /$HOME/dotfiles && cd $HOME/dotfiles//global-6.5.6 \
-    && ./configure && make -j && make install -j && cd $HOME
+    && ./configure && make -j && make install -j && cd $HOME && rm -rf dotfiles/global-6.5.6*
     # ghq settings
 RUN go get github.com/motemen/ghq \
     && git config --global ghq.root $GOPATH/src
     # bear settings
 RUN ghq get https://github.com/rizsotto/Bear \
     && cd $GOPATH/src/github.com/rizsotto/Bear \
-    && mkdir build && cd build && cmake .. && make -j && make install -j && cd
+    && mkdir build && cd build && cmake .. && make -j && make install -j && cd \
+    && rm -rf $GOPATH/src/github.com/rizsotto
     # golang settings
 RUN go get github.com/rogpeppe/godef \
     && go get -u github.com/nsf/gocode \
