@@ -11,6 +11,7 @@ RUN apt-get install -y --no-install-recommends \
     htop \
     tig \
     zsh \
+    cgdb \
     python-pip exuberant-ctags \
     emacs \
     locales \
