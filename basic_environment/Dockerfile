@@ -35,8 +35,9 @@ RUN git config --global user.name ami-GS \
     && git clone https://github.com/ami-GS/dotfiles \
     && cp $HOME/dotfiles/.tmux.conf $HOME \
     && cp $HOME/dotfiles/.emacs . \
-    && cp $HOME/dotfiles/.zshrc . \
     && cp -r $HOME/dotfiles/.emacs.d . \
+    && emacs --daemon && pkill emacs \
+    && cp $HOME/dotfiles/.zshrc . \
     && mkdir $HOME/.myconfig \
     && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P $HOME/.myconfig \
     && rm -rf $HOME/dotfiles \
