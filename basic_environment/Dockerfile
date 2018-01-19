@@ -37,7 +37,9 @@ RUN git config --global user.name ami-GS \
     && cp $HOME/dotfiles/.emacs . \
     && cp $HOME/dotfiles/.zshrc . \
     && cp -r $HOME/dotfiles/.emacs.d . \
-    && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P $HOME/dotfiles \
+    && mkdir $HOME/.myconfig \
+    && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P $HOME/.myconfig \
+    && rm -rf $HOME/dotfiles \
     && chsh -s /bin/zsh root
     # rtags settings
 RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
@@ -48,9 +50,9 @@ RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
     && cd $HOME && rm -rf $HOME/rtags
     # gtags settings
 RUN pip install Pygments \
-    && wget http://tamacom.com/global/global-6.5.6.tar.gz -P $HOME/dotfiles \
-    && tar -zxvf $HOME/dotfiles/global-6.5.6.tar.gz -C /$HOME/dotfiles && cd $HOME/dotfiles//global-6.5.6 \
-    && ./configure && make -j && make install -j && cd $HOME && rm -rf dotfiles/global-6.5.6*
+    && wget http://tamacom.com/global/global-6.5.6.tar.gz -P $HOME/gtags \
+    && tar -zxvf $HOME/gtags/global-6.5.6.tar.gz -C /$HOME/gtags && cd $HOME/gtags/global-6.5.6 \
+    && ./configure && make -j && make install -j && rm -rf $HOME/gtags
     # ghq settings
 RUN go get github.com/motemen/ghq \
     && git config --global ghq.root $GOPATH/src
