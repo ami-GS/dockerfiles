@@ -49,8 +49,9 @@ RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
     # make -j sometimes cause syncronization error
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make -j && make install \
     && cd $HOME && rm -rf $HOME/rtags
-    # gtags settings
-RUN pip install Pygments \
+    # gtags and jedi settings
+RUN pip install setuptools Pygments \
+    && pip install -U jedi epc pyflakes \
     && wget http://tamacom.com/global/global-6.5.6.tar.gz -P $HOME/gtags \
     && tar -zxvf $HOME/gtags/global-6.5.6.tar.gz -C /$HOME/gtags && cd $HOME/gtags/global-6.5.6 \
     && ./configure && make -j && make install -j && rm -rf $HOME/gtags
