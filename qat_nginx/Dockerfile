@@ -19,6 +19,8 @@ RUN yum install -y \
     zlib-devel \
     git \
     devtoolset-7 \
+    make \
+    gcc \
     wget
 RUN git clone --branch OpenSSL_1_1_0f https://github.com/openssl/openssl.git \
     && wget https://01.org/sites/default/files/page/qatmux.l.2.6.0-60.tgz \
