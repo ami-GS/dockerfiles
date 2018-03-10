@@ -4,12 +4,8 @@
 ## Usage
 
 ``` sh
->> ./docker_run_daemon.sh <image id>
-<container id>
-
->> ./docker_exec.sh <container id>
-
-docker shell >> ./insmod.sh
+>> ./docker_run_env_and_attach.sh <image id>
+docker shell >> ./init_setting.sh
 ```
 
 You should be able to access nginx http server at
@@ -33,4 +29,17 @@ Please try bellow in docker container
 >> systemctl stop qat_service
 >> rmmod icp_qa_al
 >> systemctl start qat_service
+```
+
+## Known issue
+Currently user need to do bellows before starting container.
+```sh
+>> insmod icp_qa_al.ko
+>> insmod qat_contig_mem.ko
+>> ./docker_run_env_and_attach.sh <image id>
+```
+
+If you have started container before, please check whether similar modules are loaded.
+```sh
+>> lsmod | grep qa
 ```
