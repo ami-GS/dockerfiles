@@ -1,0 +1,123 @@
+---
+- hosts: localhost
+  vars:
+    ICP_ROOT: /root/QAT/ #QAT1.7
+    ICP_BUILD_OUTPUT: "{{ ICP_ROOT }}/build"
+    OPENSSL_ROOT: /root/openssl
+    OPENSSL_LIB: "{{ OPENSSL_ROOT }}/.openssl"
+    LD_LIBRARY_PATH: "{{ OPENSSL_ROOT }}/.openssl/lib"
+    OPENSSL_ENGINES: "{{ OPENSSL_LIB }}/lib/engines-1.1"
+    NGINX_INSTALL_DIR: /usr/local/nginx
+    my_home: /root
+
+  environment:
+    ICP_ROOT: /root/QAT/ #QAT1.7
+    ICP_BUILD_OUTPUT: "{{ ICP_ROOT }}/build"
+    OPENSSL_ROOT: /root/openssl
+    OPENSSL_LIB: "{{ OPENSSL_ROOT }}/.openssl"
+    LD_LIBRARY_PATH: "{{ OPENSSL_ROOT }}/.openssl/lib"
+    OPENSSL_ENGINES: "{{ OPENSSL_LIB }}/lib/engines-1.1"
+    NGINX_INSTALL_DIR: /usr/local/nginx
+    ICP_BUILDSYSTEM_PATH: /root/QAT/quickassist/build_system
+    ICP_ENV_DIR: /root/QAT/quickassist/build_system/build_files/env_files
+    WITH_UPSTREAM: 1
+    WITH_CMDRV: 1
+
+  become: yes
+  tasks:
+    - name: get kernel version
+      shell: uname -r
+      register: kernel_version
+
+    - name: yum update
+      yum: name="{{ item }}" state=latest
+      with_items:
+        - epel-release
+        - centos-release-scl
+        - "@Development tools"
+
+    - name: yum install
+      yum: name="{{ item }}"
+      with_items:
+        - kernel-devel-{{ kernel_version.stdout }}
+        - kernel-{{ kernel_version.stdout }}
+        - boost-devel
+        - libudev-devel
+        - pciutils
+        - openssl-devel
+        - zlib-devel
+        - git
+        - devtoolset-7
+        - make
+        - gcc
+        - wget
+
+    - name: setup directories
+      file: path="{{ item }}" state=directory owner=root group=root mode=0755
+      with_items:
+        - "{{ ICP_ROOT }}"
+        - "{{ NGINX_INSTALL_DIR }}"
+        - "/usr/local/nginx/ssl"
+
+    - name: download QAT Driver
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - {url: "https://01.org/sites/default/files/downloads/intelr-quickassist-technology/qat1.7.upstream.l.1.0.3-42.tar.gz", dest: "{{ my_home }}"}
+
+    - name: untar QAT driver
+      unarchive:
+        src: "{{ my_home }}/qat1.7.upstream.l.1.0.3-42.tar.gz"
+        dest: "{{ ICP_ROOT }}"
+        remote_src: yes
+
+    - name: install QAT Driver
+      shell: "{{ item }}"
+      args: "{{ ICP_ROOT }}"
+      ignore_errors: yes
+      with_items:
+        #- "cd /root/QAT && chmod -R o-rwx * && ICP_ROOT=/root/QAT ICP_BUILDSYSTEM_PATH=/root/QAT/quickassist/build_system ICP_ENV_DIR=/root/QAT/quickassist/build_system/build_files/env_files WITH_UPSTREAM=1 WITH_CMDRV=1 ./configure && ICP_ROOT=/root/QAT ICP_BUILDSYSTEM_PATH=/root/QAT/quickassist/build_system ICP_ENV_DIR=/root/QAT/quickassist/build_system/build_files/env_files WITH_UPSTREAM=1 WITH_CMDRV=1 make install -j"
+        - "cd /root/QAT && chmod -R o-rwx * && ./configure && make install -j"
+
+    - name: downlaod git repository
+      git:
+        repo: "{{ item.url }}"
+        version: "{{ item.branch }}"
+        dest: "{{ my_home }}/{{ item.name }}"
+        force: yes
+      with_items:
+        - {name: "openssl", url: "https://github.com/openssl/openssl", branch: "OpenSSL_1_1_0f"}
+        - {name: "QAT_Engine", url: "https://github.com/01org/QAT_Engine", branch: "v0.5.30"}
+        - {name: "asynch_mode_nginx", url: "https://github.com/intel/asynch_mode_nginx", branch: "master"}
+
+    - name: setup openssl directories
+      file: path="{{ item }}" state=directory owner=root group=root mode=0755
+      with_items:
+        - "{{ OPENSSL_LIB }}"
+
+    - name: build OpenSSL
+      shell: "{{ item }}"
+      args: "{{ my_home }}/openssl"
+      with_items:
+        - "{{ OPENSSL_ROOT }}/config --prefix={{ OPENSSL_LIB }} && make -j && make install"
+
+    - name: install QAT Engine
+      shell: "{{ item }}"
+      args: "{{ my_home }}/QAT_Engine"
+      ignore_errors: yes
+      with_items:
+        - "cd /root/QAT_Engine/qat_contig_mem && make -j"
+        - "cd /root/QAT_Engine/ && ./configure --with-qat_dir={{ ICP_ROOT }} --with-openssl_dir={{ OPENSSL_ROOT }} --with-openssl_install_dir={{ OPENSSL_LIB }} --enable-upstream_driver --enable-usdm && make -j && make install"
+
+    - name: install asynch_mode_nginx
+      shell: "{{ item }}"
+      args: "{{ my_home }}/asynch_mode_nginx"
+      with_items:
+        - "cd /root/asynch_mode_nginx && ./configure --prefix={{ NGINX_INSTALL_DIR }} --with-http_ssl_module --with-cc-opt='-DNGX_SECURE_MEM -I{{ OPENSSL_LIB }}/include -Wno-error=deprecated-declarations' --with-ld-opt='-Wl,-rpath={{ OPENSSL_LIB }}/lib -L{{ OPENSSL_LIB }}/lib' && make -j && make install"
+
+    - name: generate self signed keys
+      shell: "{{ item }}"
+      with_items:
+        #- "{{ OPENSSL_LIB }}/bin/openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -subj '/C=US/ST=FL/L=Ocala/O=Home/CN=example.com' -keyout {{ NGINX_INSTALL_DIR }}/ssl/nginx.key -out {{ NGINX_INSTALL_DIR }}/ssl/nginx.cert"
+        - "{{ OPENSSL_LIB }}/bin/openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -subj '/C=US/ST=FL/L=Ocala/O=Home/CN=example.com' -keyout {{ NGINX_INSTALL_DIR }}/ssl/nginx.key -out {{ NGINX_INSTALL_DIR }}/ssl/nginx.cert"
