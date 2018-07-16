@@ -1,7 +1,8 @@
 FROM golang:latest
 
-ENV HOME=/home
-ENV GOPATH=$HOME/Go
+ENV HOME=/root
+ENV WORKSPACE=$HOME/workspace
+ENV GOPATH=$WORKSPACE
 ENV PATH=$PATH:/$GOPATH/bin
 WORKDIR $HOME
 # no RUN could reduce size 0.02GB
