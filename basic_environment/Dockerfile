@@ -34,11 +34,11 @@ RUN locale-gen en_US.UTF-8 \
 RUN git config --global user.name ami-GS \
     && git config --global user.email 1991.daiki@gmail.com \
     && git clone https://github.com/ami-GS/dotfiles \
+    && cp $HOME/dotfiles/.zshrc $HOME \
     && cp $HOME/dotfiles/.tmux.conf $HOME \
-    && cp $HOME/dotfiles/.emacs . \
-    && cp -r $HOME/dotfiles/.emacs.d . \
-    && emacs --daemon && pkill emacs \
-    && cp $HOME/dotfiles/.zshrc . \
+    && cp $HOME/dotfiles/.emacs $HOME \
+    && cp -r $HOME/dotfiles/.emacs.d $HOME \
+    && emacs --daemon -l $HOME/.emacs && pkill emacs \
     && mkdir $HOME/.myconfig \
     && wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -P $HOME/.myconfig \
     && rm -rf $HOME/dotfiles \
