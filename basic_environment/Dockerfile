@@ -49,7 +49,7 @@ RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
     && git submodule init && git submodule update \
     && mkdir build && cd build \
     # make -j sometimes cause syncronization error
-    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make -j && make install \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make && make install \
     && cd $HOME && rm -rf $HOME/rtags
     # irony-install-server
 RUN mkdir -p $HOME/irony_build && cd $HOME/irony_build \
