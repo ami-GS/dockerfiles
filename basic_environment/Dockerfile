@@ -58,9 +58,9 @@ RUN mkdir -p $HOME/irony_build && cd $HOME/irony_build \
     && rm -rf $HOME/irony_build
     # gtags and jedi settings
 RUN pip install setuptools Pygments \
-    && pip install -U jedi epc pyflakes \
-    && wget http://tamacom.com/global/global-6.5.6.tar.gz -P $HOME/gtags \
-    && tar -zxvf $HOME/gtags/global-6.5.6.tar.gz -C /$HOME/gtags && cd $HOME/gtags/global-6.5.6 \
+    && pip install -U jedi epc pyflakes virtualenv \
+    && wget http://tamacom.com/global/global-6.6.2.tar.gz -P $HOME/gtags \
+    && tar -zxvf $HOME/gtags/global-6.6.2.tar.gz -C /$HOME/gtags && cd $HOME/gtags/global-6.6.2 \
     && ./configure && make -j && make install -j && rm -rf $HOME/gtags
     # ghq settings
 RUN go get github.com/motemen/ghq \
