@@ -51,6 +51,11 @@ RUN git clone https://github.com/Andersbakken/rtags && cd $HOME/rtags \
     # make -j sometimes cause syncronization error
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMAND=1 && make -j && make install \
     && cd $HOME && rm -rf $HOME/rtags
+    # irony-install-server
+RUN mkdir -p $HOME/irony_build && cd $HOME/irony_build \
+    && IRONY_NAME=`find $HOME/.emacs.d/elpa/ -name "irony*" -type d` \
+    && cmake -DCMAKE_INSTALL_PREFIX\=$HOME/.emacs.d/irony/ $IRONY_NAME/server && cmake --build . --use-stderr --config Release --target install \
+    && rm -rf $HOME/irony_build
     # gtags and jedi settings
 RUN pip install setuptools Pygments \
     && pip install -U jedi epc pyflakes \
