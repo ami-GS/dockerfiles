@@ -73,7 +73,7 @@ RUN ghq get https://github.com/rizsotto/Bear \
     # golang settings
 RUN go get github.com/rogpeppe/godef \
     && go get -u github.com/nsf/gocode \
-    && go get github.com/golang/lint/golint \
+    && go get -u golang.org/x/lint/golint \
     && go get github.com/kisielk/errcheck \
     && go get github.com/peco/peco/cmd/peco
 
